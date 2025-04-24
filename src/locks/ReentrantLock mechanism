@@ -1,0 +1,122 @@
+Thread Lifecycle with Lock:
+       +---------------------+
+       |  Thread Attempting  |
+       |  to Enter Critical  |
+       |       Section       |
+       +----------+----------+
+                  |
+                  | lock.lock()
+                  v
+       +---------------------+
+       |   Lock Acquired     |<---+
+       | (Hold Count = 1)    |    |
+       +----------+----------+    |
+                  |               | Reentrant: Same thread
+                  | execute       | can call lock() again
+                  | critical      | (Hold Count increases)
+                  | section      |
+                  v              |
+       +---------------------+   |
+       |   Nested Lock()     |   |
+       | (Hold Count = 2)    |---+
+       +----------+----------+
+                  |
+                  | lock.unlock()
+                  v
+       +---------------------+
+       | Hold Count = 1     |
+       +----------+----------+
+                  |
+                  | lock.unlock()
+                  v
+       +---------------------+
+       |   Lock Released     |
+       | (Hold Count = 0)    |
+       +---------------------+
+                  |
+                  | lock.unlock()
+                  v
+
+         +---------------------+
+
+
+
+Key Takeaways:
+ReentrantLock allows reentrancy (nested locking by the same thread).
+
+Each lock() increments the hold count; each unlock() decrements it.
+
+The lock is only released when hold count reaches 0.
+
+Always unlock in finally blocks to prevent leaks.
+
+Beware of deadlocks with multiple locks (establish a global order).
+
+
+Why Do We Need Nested Locks?
+Nested locks (reentrancy) are needed when:
+
+1. A Method Calls Another Synchronized Method
+If a synchronized or lock()-protected method calls another method that requires the same lock, reentrancy prevents self-deadlock.
+
+Example Without Reentrancy (Problem):
+java
+Copy
+public synchronized void methodA() {
+    methodB();  // Deadlock if locks weren't reentrant!
+}
+
+public synchronized void methodB() {
+    // Needs same lock
+}
+Without reentrancy, methodB() would block forever waiting for methodA() to release the lock (which it can't).
+
+With Reentrancy (Solution):
+The thread already holds the lock, so methodB() proceeds normally.
+
+2. Recursive Locking
+If a method calls itself recursively while holding a lock:
+
+java
+Copy
+public synchronized void recursiveMethod(int n) {
+    if (n <= 0) return;
+    recursiveMethod(n - 1);  // Needs reentrancy!
+}
+Without reentrancy, this would deadlock immediately.
+
+3. Locking in Object-Oriented Designs
+If a class has multiple methods that need synchronization, and they call each other:
+
+java
+Copy
+class BankAccount {
+    private final ReentrantLock lock = new ReentrantLock();
+
+    public void withdraw(int amount) {
+        lock.lock();
+        try {
+            // Logic...
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void transfer(BankAccount to, int amount) {
+        lock.lock();
+        try {
+            this.withdraw(amount);  // Nested lock!
+            to.deposit(amount);
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+If locks weren’t reentrant, transfer() would deadlock when calling withdraw().
+
+When Would Non-Reentrant Locks Cause Problems?
+Scenario	Reentrant Lock (Works)	Non-Reentrant Lock (Deadlocks)
+Method A → Method B (same lock)	✅ Allowed	❌ Deadlock
+Recursive calls	✅ Works	❌ Deadlock
+synchronized blocks in inheritance	✅ Safe	❌ Deadlock
+

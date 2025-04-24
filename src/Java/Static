@@ -1,0 +1,80 @@
+Where can you use static?
+Use Case	    Example Syntax	                Meaning
+Static Variable	static int count;	            Shared across all objects (like a global for the class)
+Static Method	static void utility()	        Can be called without an object (e.g., Math.max())
+Static Block	static { ...}                   Runs once when class is loaded (used for initialization)
+Static Class	static class Nested { ... }	    Inner class that doesn’t need access to outer class's instance fields
+
+1. Can static methods be overridden?
+Trick Question!
+➡ No, static methods can be hidden, but not overridden in the traditional polymorphic sense.
+
+🔍 Example:
+java
+Copy
+Edit
+class Parent {
+    static void greet() {
+        System.out.println("Hello from Parent");
+    }
+}
+
+class Child extends Parent {
+    static void greet() {
+        System.out.println("Hello from Child");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Parent p = new Child();  // this is runtime polymorphism
+        p.greet(); // Output: Hello from Parent ❗ Not Child
+    }
+}
+🧠 Why? Because static methods are resolved at compile-time, not runtime.
+
+Can we access static variables inside non-static methods and vice versa?
+✅ You can access static variables from non-static methods (since they belong to the class).
+
+❌ You cannot access non-static variables inside a static method directly.
+
+Can a class be static?
+✅ Inner classes can be static (called static nested classes).
+
+❌ Top-level classes (outermost ones) cannot be static.
+
+Why use static nested classes?
+To group classes logically and save memory when the nested class doesn’t need access to outer class instance.
+
+java
+Copy
+Edit
+class Outer {
+    static class Inner {
+        void print() {
+            System.out.println("Static inner class");
+        }
+    }
+}
+
+Can we use this inside a static method?
+❌ No. this refers to the current object, and static methods do not belong to any object.
+
+Is static memory shared across different classloaders?
+❌ No. Static variables are not shared across different classloaders.
+Static variables are shared per ClassLoader.
+
+If the same class is loaded by different classloaders, they’ll each have their own copy of static variables.
+
+🧠 Use Case: Web apps on same server can load same classes in different contexts (isolation via classloaders).
+
+Singleton Pattern Using Static
+class Singleton {
+    private static final Singleton instance = new Singleton();
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        return instance;
+    }
+}

@@ -1,0 +1,3 @@
+Collections vs streams :
+Collections refers to group f objects
+Streams - contains objects that are taken from collection

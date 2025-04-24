@@ -1,0 +1,28 @@
+Builder patterns -
+Pattern used to create objects made from a bunch of other objects
+
+when you want to build an object made up from other objects
+when you want the creation of these parts to be independent of the main object
+Hide the creation of the parts from the client so both arent dependent
+The builder knows the specifics and nobody else does
+
+Event Based Architecture -
+
+Do not directly interact with services instead stays in event bus like structure
+Service consumes event and check if its relevant
+e.g Git , React , Node.js
+Publisher and Subscriber model
+Availability - each of services can store event data in local db because services dont need to be dependent
+on other service for information about events
+ - benefits - easy rollback/ move to point in history
+ - Replacement - easy to replace services
+ - Transaction gauranty
+ - Store Intent of the data while storing events
+
+ Disadvantages-
+ - Consistency
+ - N/A to Gateway
+ - Lesser Control with req and response
+ - Hidden flow - like service1 sents out events to events bus then what other services do with it is unknow
+ - Migration
+
