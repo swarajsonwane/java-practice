@@ -1,0 +1,68 @@
+What is AtomicInteger?
+Part of java.util.concurrent.atomic
+Provides atomic operations like incrementAndGet(), compareAndSet(), etc.
+
+Lock-free and thread-safe
+
+Ideal for counters, flags, accumulators
+
+✅ When to Use:
+You have a shared integer across threads.
+
+You want better performance than synchronized.
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class Counter {
+    private static AtomicInteger count = new AtomicInteger(0);
+
+    public static void main(String[] args) {
+        Runnable task = () -> {
+            for (int i = 0; i < 1000; i++) {
+                count.incrementAndGet(); // atomic
+            }
+        };
+
+        Thread t1 = new Thread(task);
+        Thread t2 = new Thread(task);
+        t1.start(); t2.start();
+
+        try { t1.join(); t2.join(); } catch (Exception e) {}
+        System.out.println("Final count: " + count); // Always 2000
+    }
+}
+
+
+What is volatile?
+A keyword that ensures visibility of changes to variables across threads.
+
+Does not guarantee atomicity.
+✅ When to Use:
+When a variable can be updated by one thread, and others only read it.
+
+One writer, many readers scenario.
+
+public class FlagTest {
+    private static volatile boolean flag = false;
+
+    public static void main(String[] args) {
+        new Thread(() -> {
+            while (!flag) {
+                // now visible
+            }
+            System.out.println("Stopped");
+        }).start();
+
+        try { Thread.sleep(1000); } catch (Exception e) {}
+        flag = true;
+    }
+}
+🔥 volatile ensures changes to flag are visible to all threads immediately.
+
+🆚 AtomicInteger     vs                          volatile
+Feature	            AtomicInteger	             volatile
+Thread Safety	    ✅ Yes	                    ❌ Only visibility
+Atomic Operations	✅ Yes (add, inc)	        ❌ No (x++ is NOT atomic)
+Performance	        ✅ Very fast (lock-free)     ✅ Very fast
+Use Case	        Counters, flags	            Visibility of flags
+Memory Semantics	Full memory barriers	    Visibility only

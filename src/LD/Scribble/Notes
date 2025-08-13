@@ -1,0 +1,24 @@
+Key Concepts for Server-Side Design:
+
+Canvas State: The central piece of data the server manages is the collection of shapes drawn by users.
+
+Shape Representation: Each shape must be represented as an object with its type, coordinates, and color.
+
+Concurrency: Multiple users (simulated as separate threads or calls) will be adding shapes concurrently.
+
+Notification: The server needs a mechanism to "notify" external systems (which would be actual clients in a full application) that the canvas state has changed. This is where the Observer Pattern comes in handy.
+
+Design Patterns: We'll use Singleton for the Canvas Manager and Strategy (implicitly through polymorphism) for shapes, and Observer for notification.
+
+Design Patterns Used (Server-Side Focus):
+Singleton Pattern: For the CanvasManager. There should be only one central authority managing the shared canvas state across all users.
+
+Strategy Pattern (Implicit via Polymorphism):
+While not a strict strategy interface for drawing on the server, the concept of
+ different Shape types having their own draw methods (if they were to draw) or
+ simply being handled distinctly based on their type leverages polymorphism,
+ which is related to the flexibility that the Strategy pattern aims for.
+ For a pure server, shapes are data, not drawing logic, so the "strategy" is more about how they are stored and identified.
+
+Observer Pattern: This is crucial for the server to notify
+ interested parties (simulated "listeners") whenever the canvas state changes. This replaces the network broadcasting from the previous example with a more abstract "notification" mechanism.

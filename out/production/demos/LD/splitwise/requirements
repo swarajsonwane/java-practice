@@ -1,0 +1,14 @@
+Requirements
+1- Add friends
+2- Add/manage groups
+3- Add/Manage friends inside groups
+4- Manage Expenses in/out group
+5- Split Expenses - Equal, Unequal, Percentage
+
+Object Identification
+1 - User
+2 - Group
+3 - Expense
+4 - Friend
+5 - Split ?
+6 - BalanceSheet

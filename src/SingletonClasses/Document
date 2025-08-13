@@ -1,0 +1,154 @@
+What is singleton pattern?
+- creational design patters
+- only one instance of class exist in JVM
+- logging, caching, threadpool
+
+Lazy intialization - works for single threaded applications
+
+// Example of Singleton Pattern in Java
+
+public class Document {
+
+    // Static variable to hold the single instance of the class
+    private static Document instance;
+
+    // Private constructor prevents instantiation from other classes
+    private Document() {
+        // Initialization code here
+    }
+
+    // Public method to provide access to the instance
+    public static Document getInstance() {
+        if (instance == null) {  // lazy initialization
+            instance = new Document();
+        }
+        return instance;
+    }
+
+    // Example method in the singleton class
+    public void printDocument() {
+        System.out.println("Printing document...");
+    }
+}
+
+// Example usage of the Singleton class
+package SingletonClasses.Document;
+public class Main {
+    public static void main(String[] args) {
+        // Get the single instance of Document
+        Document document = Document.getInstance();
+
+        // Call a method on the singleton instance
+        document.printDocument();
+    }
+}
+
+//What is a Static Block in Java?
+  A static block (also called a static initializer block)
+  is a block of code inside a Java class that is run once when
+  the class is loaded into memory — before any object is created
+   and before any static methods are called.
+
+public class Example {
+
+    static {
+        // This runs once when the class is first loaded
+        System.out.println("Static block executed");
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Main method executed");
+    }
+}
+
+output:
+Static block executed
+Main method executed
+
+A static block runs:
+
+Exactly once, when the class is loaded by the JVM.
+Before:
+    The first static method is called (like getInstance()),
+    Or the first static variable is accessed,
+    Or the first object is created.
+
+
+// Example of Singleton Pattern with handling expection in static block also an eager initialization
+
+public class Document {
+
+    // Static variable to hold the single instance of the class
+    private static Document instance;
+
+    // Private constructor prevents instantiation from other classes
+    private Document() {
+        // Initialization code here
+    }
+
+    // Static block for eager initialization
+    static {
+        try {
+            instance = new Document(); // Create the instance eagerly
+        } catch (Exception e) {
+            throw new RuntimeException("Exception occurred while creating singleton instance", e);
+        }
+    }
+
+    // Public method to provide access to the instance
+    public static Document getInstance() {
+        return instance;
+    }
+
+    // Example method in the singleton class
+    public void printDocument() {
+        System.out.println("Printing document...");
+    }
+}
+
+Thread Safety in Singleton Pattern
+
+// Add synchronized keyword to the getInstance method to make it thread-safe
+
+public synchronized static Document getInstance() {
+    if (instance == null) {  // lazy initialization
+        instance = new Document();
+    }
+    return instance;
+}
+
+Here suppose 10 threads calls getInstance, only once the object will be created and all other threads will get the same instance.
+But this approach can lead to performance issues due to the overhead of synchronization. as it locks the method for every call,
+ even after the instance is created.
+
+// To avoid this, we can use double-checked locking
+
+
+    // Public method to provide access to the instance with double-checked locking
+    public static Document getInstance() {
+        if (instance == null) {  // First check (no locking)
+            synchronized (Document.class) {  // Locking the class
+                if (instance == null) {  // Second check (with locking)
+                    instance = new Document();  // Lazy initialization
+                }
+            }
+        }
+        return instance;
+    }
+
+Here the first check is done without locking, which allows multiple threads to access the method without waiting for the lock.
+The second check is done inside the synchronized block, ensuring that only one thread can create the instance at a time.
+So for new threads, they will not enter the synchronized block if the instance is already created, thus improving performance.
+
+Another approach is to use the Bill Pugh Singleton Design Pattern, which uses a static inner helper class to hold the instance.
+
+SingleTon patterns can be broken by serialization and deserialization, reflection, and cloning.
+
+To prevent from reflection breaking- we can use enum or throw exception in the private constructor if instance is already created.
+Why enum? as its constuctors cannt be accessed by reflection, jvm internally ensures that only one instance of the enum is created, and it is thread-safe by default.
+
+Serialization can be prevented by implementing readResolve method in the singleton class.
+
+For cloning, we can override the clone method to throw CloneNotSupportedException.
+
+

@@ -1,0 +1,63 @@
+hashCode():
+
+Compute hash using key.hashCode()
+
+Index (Bucket Location):
+
+Calculate index as hash & (n - 1) (where n = table.length)
+
+Fast because it's a bitwise AND, not modulo
+
+Insert Entry:
+
+If bucket empty → store node
+
+Else → collision!
+
+
+key.hashCode()	Generates raw hash (could be bad distribution)
+hash = h ^ (h >>> 16)	Hash spreading: mixes bits for better hashing
+(n - 1) & hash	Converts hash to valid array index (bucket)
+
+
+       +---------------------------------+
+       |         Put(key, value)         |
+       +----------------+----------------+
+                        |
+                        v
+       +-------------------------------+
+       |     Compute key.hashCode()    |
+       +----------------+--------------+
+                        |
+                        v
+       +-----------------------------------------------+
+       | Apply hashing (e.g., hash = h ^ (h >>> 16))    |
+       +----------------+------------------------------+
+                        |
+                        v
+       +--------------------------------------------+
+       | Compute bucket index: (n - 1) & hash       |
+       +----------------+---------------------------+
+                        |
+                        v
+       +--------------------------------------------+
+       | Check if bucket at index is empty          |
+       +-----+--------------------------------------+
+             | Yes                                  | No (Collision)
+             v                                      v
+ +----------------------------+         +-------------------------------+
+ | Insert new Node(key, val) |         | Traverse linked list / tree   |
+ +----------------------------+         | using .equals(key)            |
+                                        +--------------+----------------+
+                                                       |
+                                 +---------------------+----------------------+
+                                 | Key exists → update value                  |
+                                 | Key doesn't exist → append new Node       |
+                                 +---------------------+----------------------+
+                                                       |
+                                                       v
+                                      +----------------------------------+
+                                      | Check if list size > TREEIFY_THRESHOLD
+                                      | → Convert to TreeNode (RB Tree)
+                                      +----------------------------------+
+
