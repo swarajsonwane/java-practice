@@ -152,3 +152,8 @@ Serialization can be prevented by implementing readResolve method in the singlet
 For cloning, we can override the clone method to throw CloneNotSupportedException.
 
 
+why serialization can break singleton pattern?
+Serialization creates an object bypassing the private constructor.
+This always produces a new instance unless you override the behavior.
+To prevent this, implement the readResolve method to return the existing instance.
+
